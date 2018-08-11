@@ -31,6 +31,16 @@ However, I found the Python script too complicated for my needs; I know the IP
 address of my printer and I don't need zeroconf and all the automagic.
 Furthermore, I wanted a tidier, more up-to-date Python 3 script.
 
+## Protocol description
+
+It's cool you can have such a REST interface to a scanner.
+
+1. `POST` a `text/xml` to `/eSCL/ScanJobs` to create a scan job.
+2. Receive `HTTP 201`, where the `Location` header gives you the job URL.
+3. You can `DELETE` that job URL to cancel it.
+4. You can `GET $job_url/NextDocument` to obtain a JPEG file.
+   This automatically closes the job.
+
 ## License
 
 3-clause BSD.
