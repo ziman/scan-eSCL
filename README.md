@@ -33,7 +33,7 @@ Furthermore, I wanted a tidier, more up-to-date Python 3 script.
 
 ## Protocol description
 
-It's cool you can have such a REST interface to a scanner.
+It's cool you can have a RESTful interface to a scanner.
 
 1. `POST` a `text/xml` to `/eSCL/ScanJobs` to create a scan job.
 2. Receive `HTTP 201`, where the `Location` header gives you the job URL.
