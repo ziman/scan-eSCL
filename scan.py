@@ -32,9 +32,12 @@ XML_REQUEST = """
 def main(args):
     http = requests.Session()
 
-    scanner_url = 'http://' + args.scanner_ip
-    if args.port != 80:
-        scanner_url += ':' + str(port)
+    if args.port == 443:
+        scanner_url = 'https://' + args.scanner_ip
+    elif args.port == 80:
+        scanner_url = 'http://' + args.scanner_ip
+    else:
+        scanner_url = 'http://' + args.scanner_ip + ':' + str(port)
 
     resp = http.post(
         urljoin(scanner_url, 'eSCL/ScanJobs'),
