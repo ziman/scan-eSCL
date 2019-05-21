@@ -37,7 +37,7 @@ def main(args):
     elif args.port == 80:
         scanner_url = 'http://' + args.scanner_ip
     else:
-        scanner_url = 'http://' + args.scanner_ip + ':' + str(port)
+        scanner_url = 'http://' + args.scanner_ip + ':' + str(args.port)
 
     resp = http.post(
         urljoin(scanner_url, 'eSCL/ScanJobs'),
@@ -63,7 +63,7 @@ def main(args):
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('-o', '--outfile', default='scan.jpg', help='output file name [%(default)s]')
-    ap.add_argument('-p', '--port', default=80, help='http port [%(default)s]')
+    ap.add_argument('-p', '--port', default=80, type=int, help='http port [%(default)s]')
     ap.add_argument('-c', '--color-mode', default='RGB24', help='Grayscale8 or RGB24 [%(default)s]')
     ap.add_argument('scanner_ip', help='IP address of the scanner')
     main(ap.parse_args())
