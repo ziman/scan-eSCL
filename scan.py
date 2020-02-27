@@ -17,15 +17,15 @@ XML_REQUEST = """
   <pwg:Version>2.0</pwg:Version>
   <pwg:ScanRegions>
     <pwg:ScanRegion>
-      <pwg:Height>3300</pwg:Height>
+      <pwg:Height>{height}</pwg:Height>
       <pwg:ContentRegionUnits>escl:ThreeHundredthsOfInches</pwg:ContentRegionUnits>
-      <pwg:Width>2550</pwg:Width>
+      <pwg:Width>{width}</pwg:Width>
       <pwg:XOffset>0</pwg:XOffset>
       <pwg:YOffset>0</pwg:YOffset>
     </pwg:ScanRegion>
   </pwg:ScanRegions>
   <pwg:InputSource>Platen</pwg:InputSource>
-  <scan:ColorMode>%s</scan:ColorMode>
+  <scan:ColorMode>{color_mode}</scan:ColorMode>
 </scan:ScanSettings>
 """.strip()
 
@@ -39,9 +39,19 @@ def main(args):
     else:
         scanner_url = 'http://' + args.scanner_ip + ':' + str(args.port)
 
+    dpi = 300
+    width_mm = 210
+    height_mm = 297
+    height_px = int(height_mm * dpi / 25.4)
+    width_px = int(width_mm * dpi / 25.4)
+
     resp = http.post(
         urljoin(scanner_url, 'eSCL/ScanJobs'),
-        data=XML_REQUEST % args.color_mode,
+        data=XML_REQUEST.format(
+            color_mode=args.color_mode,
+            width=width_px,
+            height=height_px,
+        ),
         headers={'Content-Type': 'text/xml'},
     )
     resp.raise_for_status()
