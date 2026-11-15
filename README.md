@@ -29,7 +29,8 @@ I wanted to scan from my Canon Pixma TS5050. I found these two resources:
 
 However, I found the Python script too complicated for my needs; I know the IP
 address of my printer and I don't need zeroconf and all the automagic.
-Furthermore, I wanted a tidier, more up-to-date Python 3 script.
+Furthermore, I wanted a tidier, more up-to-date Python 3 script,
+depending only on the Python standard library.
 
 ## Protocol description
 

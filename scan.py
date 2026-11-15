@@ -4,8 +4,8 @@
 # and http://testcluster.blogspot.com/2014/03/scanning-from-escl-device-using-command.html
 
 import logging
-import requests
 import argparse
+import urllib.request
 from urllib.parse import urljoin
 
 logging.basicConfig(level=logging.DEBUG)
@@ -29,15 +29,13 @@ XML_REQUEST = """
 </scan:ScanSettings>
 """.strip()
 
-def main(args):
-    http = requests.Session()
-
+def main(args : argparse.Namespace) -> None:
     if args.port == 443:
-        scanner_url = 'https://' + args.scanner_ip
+        scanner_url = f'https://{args.scanner_ip}'
     elif args.port == 80:
-        scanner_url = 'http://' + args.scanner_ip
+        scanner_url = f'http://{args.scanner_ip}'
     else:
-        scanner_url = 'http://' + args.scanner_ip + ':' + str(args.port)
+        scanner_url = f'http://{args.scanner_ip}:{args.port}'
 
     dpi = 300
     width_mm = 210
@@ -45,30 +43,31 @@ def main(args):
     height_px = int(height_mm * dpi / 25.4)
     width_px = int(width_mm * dpi / 25.4)
 
-    resp = http.post(
+    req = urllib.request.Request(
         urljoin(scanner_url, 'eSCL/ScanJobs'),
         data=XML_REQUEST.format(
             color_mode=args.color_mode,
             width=width_px,
             height=height_px,
-        ),
+        ).encode('ascii'),
         headers={'Content-Type': 'text/xml'},
     )
-    resp.raise_for_status()
+    with urllib.request.urlopen(req) as resp:
+        assert resp.status == 201
 
-    # status code is 201 so Requests won't follow Location
-    # we just retrieve it from resp.headers
-    result_url = urljoin(resp.headers['Location'] + '/', 'NextDocument')
-    log.debug("Final document at: %s", result_url)
+        # status code is 201 so Requests won't follow Location
+        # we just retrieve it from resp.headers
+        result_url = urljoin(resp.headers['Location'] + '/', 'NextDocument')
+        log.debug("Final document at: %s", result_url)
 
-    resp = http.get(result_url)
-    resp.raise_for_status()
+    with urllib.request.urlopen(result_url, timeout=60) as resp:
+        assert resp.status == 200
 
-    log.info("Scanning to: %s", args.outfile)
-    with open(args.outfile, 'wb') as f:
-        f.write(resp.content)
+        log.info("Scanning to: %s", args.outfile)
+        with open(args.outfile, 'wb') as f:
+            f.write(resp.read())
 
-    log.info("Done!")
+        log.info("Done!")
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
